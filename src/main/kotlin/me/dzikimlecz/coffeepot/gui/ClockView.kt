@@ -1,4 +1,4 @@
-package me.dzikimlecz.coffeepot.app.gui
+package me.dzikimlecz.coffeepot.gui
 
 
 import javafx.geometry.Pos

@@ -1,4 +1,4 @@
-package me.dzikimlecz.coffeepot.app.gui
+package me.dzikimlecz.coffeepot.gui
 
 import tornadofx.View
 import kotlin.reflect.KClass
