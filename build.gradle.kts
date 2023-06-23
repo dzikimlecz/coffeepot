@@ -3,6 +3,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 plugins {
     kotlin("jvm") version "1.8.21"
     application
+    id("org.openjfx.javafxplugin") version "0.0.13"
 }
 
 group = "me.dzikimlecz"
@@ -14,6 +15,8 @@ repositories {
 
 dependencies {
     testImplementation(kotlin("test"))
+    implementation("no.tornado:tornadofx:1.7.20")
+
 }
 
 tasks.test {
@@ -26,4 +29,9 @@ tasks.withType<KotlinCompile> {
 
 application {
     mainClass.set("MainKt")
+}
+
+javafx {
+    version = "20"
+    modules = listOf("javafx.controls")
 }
