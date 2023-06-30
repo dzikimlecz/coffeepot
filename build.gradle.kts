@@ -16,6 +16,8 @@ repositories {
 dependencies {
     testImplementation(kotlin("test"))
     implementation("no.tornado:tornadofx:1.7.20")
+    testImplementation("org.junit.jupiter:junit-jupiter:5.8.1")
+    testImplementation("org.junit.jupiter:junit-jupiter:5.8.1")
     val oneBusAwayVersion = "1.3.4"
     implementation("org.onebusaway:onebusaway-gtfs:$oneBusAwayVersion")
     implementation("org.onebusaway:onebusaway-gtfs-hibernate:$oneBusAwayVersion")
