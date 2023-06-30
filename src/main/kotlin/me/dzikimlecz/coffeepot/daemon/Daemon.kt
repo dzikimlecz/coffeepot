@@ -40,7 +40,7 @@ fun fetchWeatherImage(location: String, savePath: String = "w.png") {
     }
     val out = Path.of(savePath).toFile()
     if (!out.canWrite()) {
-        out.parentFile.mkdirs()
+        out.absoluteFile.parentFile.mkdirs()
         out.createNewFile()
         out.setWritable(true)
     }
@@ -50,5 +50,17 @@ fun fetchWeatherImage(location: String, savePath: String = "w.png") {
         throw IOException("Cannot write to $savePath")
     }
 }
+
+fun getWeather(location: String) {
+    val res: String
+    try {
+        res = http.get("https://wttr.in/$location?format=3").text()!!
+    } catch (e: Exception) {
+        throw IOException("Couldn't fetch weather for $location", e)
+    }
+    _weatherProperty.set(res)
+}
+
+
 
 

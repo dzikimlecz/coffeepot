@@ -3,17 +3,12 @@ package me.dzikimlecz.coffeepot.daemon
 
 
 import javafx.application.Platform
-import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
 import java.io.File
 import kotlin.test.assertTrue
 
 class DaemonKtTest {
-
-    @BeforeEach
-    fun setUp() {
-        Platform.startup {  }
-    }
 
     @Test
     fun `does fetchWeatherImage downloads a file`() {
@@ -25,6 +20,26 @@ class DaemonKtTest {
         //then
         assertTrue("File with an image should exist") {
             File(path).exists()
+        }
+    }
+
+    @Test
+    fun `does getWeather sets weatherProperty to a correct location`() {
+        //given
+        val loc = "Poznań"
+        //when
+        getWeather(loc)
+        //then
+        assertTrue("Weather should be fetched for the given location") {
+            weatherProperty.get().contains(loc)
+        }
+    }
+
+    companion object {
+        @JvmStatic
+        @BeforeAll
+        fun setUp() {
+            Platform.startup { }
         }
     }
 }
