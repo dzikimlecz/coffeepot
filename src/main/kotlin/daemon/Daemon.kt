@@ -1,5 +1,6 @@
 package daemon
 
+import javafx.application.Platform.runLater
 import javafx.beans.property.ReadOnlyStringProperty
 import javafx.beans.property.SimpleStringProperty
 import me.dzikimlecz.coffeepot.Resources
@@ -12,8 +13,8 @@ import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 import java.util.concurrent.Executors
 import java.util.concurrent.ScheduledExecutorService
-import java.util.concurrent.TimeUnit.SECONDS
 import java.util.concurrent.TimeUnit.MINUTES
+import java.util.concurrent.TimeUnit.SECONDS
 
 ///////////////////////////////////////////////////////////////////////////
 // DAEMON
@@ -32,13 +33,14 @@ fun startDaemon() {
     with(executor) {
         scheduleAtFixedRate(
             {
-                time.set(
-                    LocalTime.now().format(
-                        DateTimeFormatter.ofPattern(
-                            "HH:mm"
-                        )
+                val timeStr = LocalTime.now().format(
+                    DateTimeFormatter.ofPattern(
+                        "HH:mm"
                     )
                 )
+                runLater {
+                    time.set(timeStr)
+                }
             },
             0, 5,
             SECONDS
@@ -118,7 +120,7 @@ fun getWeather(location: String) {
     if (!response.ok()) {
         failFetchingWeather(location)
     }
-    weather.set(response.text())
+    runLater { weather.set(response.text()) }
 }
 
 private fun failFetchingWeather(
