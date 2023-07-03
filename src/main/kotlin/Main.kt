@@ -1,5 +1,5 @@
 package me.dzikimlecz.coffeepot
-import tornadofx.launch
+import javafx.stage.Stage
 import me.dzikimlecz.coffeepot.gui.MainView
 import me.dzikimlecz.coffeepot.gui.Stylesheets
 import tornadofx.App
@@ -14,5 +14,13 @@ class CoffeePot : App(MainView::class, Stylesheets::class) {
 
     override fun stop() {
         stopDaemon()
+    }
+
+    override fun start(stage: Stage) {
+        super.start(stage)
+        if ("--debug" in parameters.unnamed) {
+            stage.maxHeight = 320.0
+            stage.maxWidth = 480.0
+        }
     }
 }
