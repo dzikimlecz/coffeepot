@@ -19,7 +19,7 @@ class DaemonKtTest {
         val loc = "Poznań"
         val path = "w.png"
         //when
-        fetchWeatherImage(loc, path)
+        fetchWeatherImage(loc)
         //then
         assertTrue("File with an image should exist") {
             File(path).exists()

@@ -1,13 +1,15 @@
 package me.dzikimlecz.coffeepot
 
 import javafx.application.Platform.runLater
+import javafx.beans.property.ReadOnlyObjectProperty
 import javafx.beans.property.ReadOnlyStringProperty
+import javafx.beans.property.SimpleObjectProperty
 import javafx.beans.property.SimpleStringProperty
+import javafx.scene.image.Image
 import tornadofx.Rest
 import tornadofx.RestException
 import tornadofx.find
 import java.io.IOException
-import java.nio.file.Path
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 import java.util.concurrent.Executors
@@ -48,8 +50,7 @@ fun startDaemon() {
             {
                 getWeather(Resources.location)
                 fetchWeatherImage(
-                    Resources.location,
-                    Resources.weatherImagePath
+                    Resources.location
                 )
             },
             0, 30,
@@ -82,11 +83,15 @@ private val time = SimpleStringProperty()
 
 val weatherProperty: ReadOnlyStringProperty
     get() = weather
-
 private val weather = SimpleStringProperty()
+
+val weatherImageProperty: ReadOnlyObjectProperty<Image>
+    get() = weatherImage
+private val weatherImage = SimpleObjectProperty<Image>()
+
 private val http = find<Rest>()
 
-fun fetchWeatherImage(location: String, savePath: String) {
+fun fetchWeatherImage(location: String) {
     val response: Rest.Response
     try {
         response = http.get("https://v2.wttr.in/$location.png")
@@ -96,17 +101,8 @@ fun fetchWeatherImage(location: String, savePath: String) {
     if (!response.ok()) {
         failFetchingWeather(location)
     }
-    with(Path.of(savePath).toFile()) {
-        if (!canWrite()) {
-            createNewFile()
-            setWritable(true)
-        }
-        if (canWrite()) {
-            writeBytes(response.bytes())
-        } else {
-            throw IOException("Cannot write to $savePath")
-        }
-    }
+    val image = Image(response.content())
+    runLater { weatherImage.set(image) }
 }
 
 fun getWeather(location: String) {
