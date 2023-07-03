@@ -1,9 +1,8 @@
-package daemon
+package me.dzikimlecz.coffeepot
 
 import javafx.application.Platform.runLater
 import javafx.beans.property.ReadOnlyStringProperty
 import javafx.beans.property.SimpleStringProperty
-import me.dzikimlecz.coffeepot.Resources
 import tornadofx.Rest
 import tornadofx.RestException
 import tornadofx.find

@@ -1,6 +1,4 @@
 package me.dzikimlecz.coffeepot
-import daemon.startDaemon
-import daemon.stopDaemon
 import tornadofx.launch
 import me.dzikimlecz.coffeepot.gui.MainView
 import tornadofx.App
