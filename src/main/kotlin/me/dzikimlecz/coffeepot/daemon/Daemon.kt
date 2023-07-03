@@ -8,7 +8,9 @@ import tornadofx.find
 import java.io.IOException
 import java.nio.file.Path
 
-
+///////////////////////////////////////////////////////////////////////////
+// DAEMON
+///////////////////////////////////////////////////////////////////////////
 
 fun startDaemon() {
 
@@ -18,8 +20,19 @@ fun stopDaemon() {
 
 }
 
+
+///////////////////////////////////////////////////////////////////////////
+// TIME
+///////////////////////////////////////////////////////////////////////////
+
 val timeProperty: ReadOnlyStringProperty
     get() = time
+
+private val time = SimpleStringProperty("21:37")
+
+///////////////////////////////////////////////////////////////////////////
+// WEATHER
+///////////////////////////////////////////////////////////////////////////
 
 val weatherProperty: ReadOnlyStringProperty
     get() = weather
@@ -27,7 +40,6 @@ val weatherProperty: ReadOnlyStringProperty
 val weatherImageProperty: ReadOnlyStringProperty
     get() = weatherImage
 
-private val time = SimpleStringProperty("21:37")
 private val weather = SimpleStringProperty("piździ")
 private val weatherImage = SimpleStringProperty()
 private val http = find<Rest>()
