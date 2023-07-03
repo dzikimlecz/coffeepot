@@ -2,6 +2,7 @@ package me.dzikimlecz.coffeepot.daemon
 
 import javafx.beans.property.ReadOnlyStringProperty
 import javafx.beans.property.SimpleStringProperty
+import me.dzikimlecz.coffeepot.Resources
 import tornadofx.Rest
 import tornadofx.RestException
 import tornadofx.find
@@ -13,12 +14,6 @@ import java.util.concurrent.Executors
 import java.util.concurrent.ScheduledExecutorService
 import java.util.concurrent.TimeUnit.SECONDS
 import java.util.concurrent.TimeUnit.MINUTES
-
-///////////////////////////////////////////////////////////////////////////
-// TEMP TODO REPLACE WITH RESOURCES
-///////////////////////////////////////////////////////////////////////////
-
-const val location = "Poznań"
 
 ///////////////////////////////////////////////////////////////////////////
 // DAEMON
@@ -50,8 +45,11 @@ fun startDaemon() {
         )
         scheduleAtFixedRate(
             {
-                getWeather(location)
-                fetchWeatherImage(location)
+                getWeather(Resources.location)
+                fetchWeatherImage(
+                    Resources.location,
+                    Resources.weatherImagePath
+                )
             },
             0, 30,
             MINUTES
