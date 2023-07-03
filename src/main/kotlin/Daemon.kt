@@ -29,6 +29,13 @@ fun startDaemon() {
         Thread(it).apply {
             name = "coffeepotDaemon"
             isDaemon = true
+            uncaughtExceptionHandler =
+                Thread.UncaughtExceptionHandler { _, e ->
+                    System.err.println(
+                        "${e::class.simpleName} thrown on daemon"
+                    )
+                    System.err.println("Message: ${e.message}")
+                }
         }
     }
     with(executor) {
