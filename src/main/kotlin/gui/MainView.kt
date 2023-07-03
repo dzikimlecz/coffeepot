@@ -13,6 +13,7 @@ class MainView : View() {
     }
 
     init {
+        title = "coffeepot"
         viewProperty.onChange {
             root.center(it?.view
                 ?: throw Error("MainView's central pane set to null"))
