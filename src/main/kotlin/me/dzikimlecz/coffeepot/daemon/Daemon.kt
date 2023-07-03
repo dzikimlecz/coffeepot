@@ -7,19 +7,66 @@ import tornadofx.RestException
 import tornadofx.find
 import java.io.IOException
 import java.nio.file.Path
+import java.time.LocalTime
+import java.time.format.DateTimeFormatter
+import java.util.concurrent.Executors
+import java.util.concurrent.ScheduledExecutorService
+import java.util.concurrent.TimeUnit.SECONDS
+import java.util.concurrent.TimeUnit.MINUTES
+
+///////////////////////////////////////////////////////////////////////////
+// TEMP TODO REPLACE WITH RESOURCES
+///////////////////////////////////////////////////////////////////////////
+
+const val location = "Poznań"
 
 ///////////////////////////////////////////////////////////////////////////
 // DAEMON
 ///////////////////////////////////////////////////////////////////////////
 
 fun startDaemon() {
-
+    if (::executor.isInitialized && !executor.isShutdown) {
+        throw IllegalStateException("Daemon has already been started.")
+    }
+    executor = Executors.newScheduledThreadPool(2) {
+        Thread(it).apply {
+            name = "coffeepotDaemon"
+            isDaemon = true
+        }
+    }
+    with(executor) {
+        scheduleAtFixedRate(
+            {
+                time.set(
+                    LocalTime.now().format(
+                        DateTimeFormatter.ofPattern(
+                            "HH:mm"
+                        )
+                    )
+                )
+            },
+            0, 5,
+            SECONDS
+        )
+        scheduleAtFixedRate(
+            {
+                getWeather(location)
+                fetchWeatherImage(location)
+            },
+            0, 30,
+            MINUTES
+        )
+    }
 }
 
 fun stopDaemon() {
-
+    if (!::executor.isInitialized || executor.isShutdown) {
+        throw IllegalStateException("Daemon isn't running.")
+    }
+    executor.shutdown()
 }
 
+private lateinit var executor: ScheduledExecutorService
 
 ///////////////////////////////////////////////////////////////////////////
 // TIME
@@ -28,7 +75,7 @@ fun stopDaemon() {
 val timeProperty: ReadOnlyStringProperty
     get() = time
 
-private val time = SimpleStringProperty("21:37")
+private val time = SimpleStringProperty()
 
 ///////////////////////////////////////////////////////////////////////////
 // WEATHER
@@ -40,7 +87,7 @@ val weatherProperty: ReadOnlyStringProperty
 val weatherImageProperty: ReadOnlyStringProperty
     get() = weatherImage
 
-private val weather = SimpleStringProperty("piździ")
+private val weather = SimpleStringProperty()
 private val weatherImage = SimpleStringProperty()
 private val http = find<Rest>()
 
