@@ -1,8 +1,9 @@
-package me.dzikimlecz.coffeepot.gui
+package gui
 
 
+import daemon.timeProperty
+import daemon.weatherProperty
 import javafx.geometry.Pos
-import me.dzikimlecz.coffeepot.daemon.*
 import tornadofx.*
 
 class ClockView : View() {

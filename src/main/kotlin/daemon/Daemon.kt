@@ -1,4 +1,4 @@
-package me.dzikimlecz.coffeepot.daemon
+package daemon
 
 import javafx.beans.property.ReadOnlyStringProperty
 import javafx.beans.property.SimpleStringProperty

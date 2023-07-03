@@ -2,6 +2,9 @@ package me.dzikimlecz.coffeepot.daemon
 
 
 
+import daemon.fetchWeatherImage
+import daemon.getWeather
+import daemon.weatherProperty
 import javafx.application.Platform
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test

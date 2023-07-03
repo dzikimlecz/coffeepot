@@ -1,4 +1,4 @@
-package me.dzikimlecz.coffeepot.gui
+package gui
 
 import javafx.scene.layout.Priority
 import tornadofx.*
