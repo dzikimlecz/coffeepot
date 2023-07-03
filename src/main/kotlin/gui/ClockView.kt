@@ -8,12 +8,13 @@ import tornadofx.*
 
 class ClockView : View() {
     override val root = vbox {
+        addClass(Stylesheets.clockView)
         alignment = Pos.CENTER
         label(timeProperty) {
-
+            addClass(Stylesheets.clock)
         }
         label(weatherProperty) {
-
+            addClass(Stylesheets.weatherLine)
         }
     }
 }
