@@ -3,12 +3,12 @@ package me.dzikimlecz.coffeepot.daemon
 import javafx.beans.property.ReadOnlyStringProperty
 import javafx.beans.property.SimpleStringProperty
 import tornadofx.Rest
+import tornadofx.RestException
 import tornadofx.find
 import java.io.IOException
 import java.nio.file.Path
 
 
-private val http = find<Rest>()
 
 fun startDaemon() {
 
@@ -19,46 +19,63 @@ fun stopDaemon() {
 }
 
 val timeProperty: ReadOnlyStringProperty
-    get() = _timeProperty
+    get() = time
 
 val weatherProperty: ReadOnlyStringProperty
-    get() = _weatherProperty
+    get() = weather
 
 val weatherImageProperty: ReadOnlyStringProperty
-    get() = _weatherImageProperty
+    get() = weatherImage
 
-private val _timeProperty = SimpleStringProperty("21:37")
-private val _weatherProperty = SimpleStringProperty("piździ")
-private val _weatherImageProperty = SimpleStringProperty()
+private val time = SimpleStringProperty("21:37")
+private val weather = SimpleStringProperty("piździ")
+private val weatherImage = SimpleStringProperty()
+private val http = find<Rest>()
 
 fun fetchWeatherImage(location: String, savePath: String = "w.png") {
-    val bin: ByteArray
+    val response: Rest.Response
     try {
-        bin = http.get("https://v2.wttr.in/$location.png").bytes()
+        response = http.get("https://v2.wttr.in/$location.png")
     } catch (e: Exception) {
-        throw IOException("Couldn't fetch weather for $location", e)
+        failFetchingWeather(location, e)
     }
-    val out = Path.of(savePath).toFile()
-    if (!out.canWrite()) {
-        out.absoluteFile.parentFile.mkdirs()
-        out.createNewFile()
-        out.setWritable(true)
+    if (!response.ok()) {
+        failFetchingWeather(location)
     }
-    if (out.canWrite()) {
-        out.writeBytes(bin)
-    } else {
-        throw IOException("Cannot write to $savePath")
+    with(Path.of(savePath).toFile()) {
+        if (!canWrite()) {
+            createNewFile()
+            setWritable(true)
+        }
+        if (canWrite()) {
+            writeBytes(response.bytes())
+        } else {
+            throw IOException("Cannot write to $savePath")
+        }
     }
 }
 
 fun getWeather(location: String) {
-    val res: String
+    val response: Rest.Response
     try {
-        res = http.get("https://wttr.in/$location?format=3").text()!!
-    } catch (e: Exception) {
+        response = http.get("https://wttr.in/$location?format=3")
+    } catch (e: RestException) {
+        failFetchingWeather(location, e)
+    }
+    if (!response.ok()) {
+        failFetchingWeather(location)
+    }
+    weather.set(response.text())
+}
+
+private fun failFetchingWeather(
+    location: String,
+    e: Exception? = null
+): Nothing {
+    if (e != null) {
         throw IOException("Couldn't fetch weather for $location", e)
     }
-    _weatherProperty.set(res)
+    throw IOException("Couldn't fetch weather for $location")
 }
 
 
