@@ -1,4 +1,4 @@
-package gui
+package me.dzikimlecz.coffeepot.gui
 
 import javafx.beans.property.SimpleObjectProperty
 import tornadofx.*

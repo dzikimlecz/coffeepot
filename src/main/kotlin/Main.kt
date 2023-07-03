@@ -2,7 +2,7 @@ package me.dzikimlecz.coffeepot
 import daemon.startDaemon
 import daemon.stopDaemon
 import tornadofx.launch
-import gui.MainView
+import me.dzikimlecz.coffeepot.gui.MainView
 import tornadofx.App
 
 fun main(args: Array<String>) = launch<CoffeePot>(args)

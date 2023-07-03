@@ -1,4 +1,4 @@
-package gui
+package me.dzikimlecz.coffeepot.gui
 
 import tornadofx.*
 class TransitView : View() {

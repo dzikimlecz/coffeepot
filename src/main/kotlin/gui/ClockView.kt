@@ -1,8 +1,8 @@
-package gui
+package me.dzikimlecz.coffeepot.gui
 
 
-import daemon.timeProperty
-import daemon.weatherProperty
+import me.dzikimlecz.coffeepot.timeProperty
+import me.dzikimlecz.coffeepot.weatherProperty
 import javafx.geometry.Pos
 import tornadofx.*
 
