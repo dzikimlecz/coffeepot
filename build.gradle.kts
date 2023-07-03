@@ -32,7 +32,7 @@ tasks.withType<KotlinCompile> {
 }
 
 application {
-    mainClass.set("MainKt")
+    mainClass.set("me.dzikimlecz.coffeepot.MainKt")
 }
 
 javafx {
