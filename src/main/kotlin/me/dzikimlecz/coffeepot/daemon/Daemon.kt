@@ -89,7 +89,7 @@ private val weather = SimpleStringProperty()
 private val weatherImage = SimpleStringProperty()
 private val http = find<Rest>()
 
-fun fetchWeatherImage(location: String, savePath: String = "w.png") {
+fun fetchWeatherImage(location: String, savePath: String) {
     val response: Rest.Response
     try {
         response = http.get("https://v2.wttr.in/$location.png")
