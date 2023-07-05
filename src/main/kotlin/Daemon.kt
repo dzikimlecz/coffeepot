@@ -1,14 +1,5 @@
 package me.dzikimlecz.coffeepot
 
-import javafx.application.Platform.runLater
-import javafx.beans.property.ReadOnlyObjectProperty
-import javafx.beans.property.ReadOnlyStringProperty
-import javafx.beans.property.SimpleObjectProperty
-import javafx.beans.property.SimpleStringProperty
-import javafx.scene.image.Image
-import tornadofx.Rest
-import tornadofx.RestException
-import tornadofx.find
 import java.io.IOException
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
@@ -46,9 +37,7 @@ fun startDaemon() {
                         "HH:mm"
                     )
                 )
-                runLater {
-                    time.set(timeStr)
-                }
+
             },
             0, 5,
             SECONDS
@@ -79,50 +68,20 @@ private lateinit var executor: ScheduledExecutorService
 // TIME
 ///////////////////////////////////////////////////////////////////////////
 
-val timeProperty: ReadOnlyStringProperty
-    get() = time
 
-private val time = SimpleStringProperty()
 
 ///////////////////////////////////////////////////////////////////////////
 // WEATHER
 ///////////////////////////////////////////////////////////////////////////
 
-val weatherProperty: ReadOnlyStringProperty
-    get() = weather
-private val weather = SimpleStringProperty()
 
-val weatherImageProperty: ReadOnlyObjectProperty<Image>
-    get() = weatherImage
-private val weatherImage = SimpleObjectProperty<Image>()
-
-private val http = find<Rest>()
 
 fun fetchWeatherImage(location: String) {
-    val response: Rest.Response
-    try {
-        response = http.get("https://v2.wttr.in/$location.png")
-    } catch (e: Exception) {
-        failFetchingWeather(location, e)
-    }
-    if (!response.ok()) {
-        failFetchingWeather(location)
-    }
-    val image = Image(response.content())
-    runLater { weatherImage.set(image) }
+
 }
 
 fun getWeather(location: String) {
-    val response: Rest.Response
-    try {
-        response = http.get("https://wttr.in/$location?format=3")
-    } catch (e: RestException) {
-        failFetchingWeather(location, e)
-    }
-    if (!response.ok()) {
-        failFetchingWeather(location)
-    }
-    runLater { weather.set(response.text()) }
+
 }
 
 private fun failFetchingWeather(
