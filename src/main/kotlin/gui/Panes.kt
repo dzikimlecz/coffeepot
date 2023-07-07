@@ -1,23 +1,25 @@
 package me.dzikimlecz.coffeepot.gui
 
 import me.dzikimlecz.coffeepot.Observable
+import me.dzikimlecz.coffeepot.gui.Panes.CLOCK
 import java.awt.BorderLayout
+import java.awt.BorderLayout.CENTER
 import javax.swing.BoxLayout
 import javax.swing.JButton
 import javax.swing.JLabel
 import javax.swing.JPanel
 import javax.swing.text.View.X_AXIS
 
-private val currentPane = Observable(Panes.CLOCK)
+private val currentPane = Observable(CLOCK)
 
 val mainPane: JPanel by lazy {
     JPanel().apply {
         layout = BorderLayout()
         add(modeSelector, BorderLayout.SOUTH)
-        add(clockPane, BorderLayout.CENTER)
+        add(clockPane, CENTER)
         currentPane.registerListener { old, new ->
             remove(old.pane())
-            add(new.pane(), BorderLayout.CENTER)
+            add(new.pane(), CENTER)
             validate()
         }
     }
@@ -48,17 +50,17 @@ enum class Panes(val title: String, val pane: () -> JPanel) {
 val clockPane: JPanel
     get() = JPanel().apply {
         layout = BorderLayout()
-        add(JLabel("C"), BorderLayout.CENTER)
+        add(JLabel("C"), CENTER)
     }
 
 val weatherPane: JPanel
     get() = JPanel().apply {
         layout = BorderLayout()
-        add(JLabel("W"), BorderLayout.CENTER)
+        add(JLabel("W"), CENTER)
     }
 
 val transitPane: JPanel
     get() = JPanel().apply {
         layout = BorderLayout()
-        add(JLabel("T"), BorderLayout.CENTER)
+        add(JLabel("T"), CENTER)
     }
