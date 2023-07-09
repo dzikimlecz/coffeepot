@@ -5,12 +5,20 @@ import java.awt.Dimension
 import java.awt.event.WindowAdapter
 import java.awt.event.WindowEvent
 import javax.swing.JFrame
+import javax.swing.UIManager
 import kotlin.system.exitProcess
 
 fun main(args: Array<String>) {
+    init()
     startDaemon()
     launchApp(args)
 
+}
+
+fun init() {
+    try {
+        UIManager.setLookAndFeel("com.sun.java.swing.plaf.gtk.GTKLookAndFeel")
+    } catch (_: Exception) {}
 }
 
 fun launchApp(args: Array<String>) {
