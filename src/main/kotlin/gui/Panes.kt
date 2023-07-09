@@ -2,8 +2,12 @@ package me.dzikimlecz.coffeepot.gui
 
 import me.dzikimlecz.coffeepot.MutableObservable
 import me.dzikimlecz.coffeepot.gui.Panes.CLOCK
+import me.dzikimlecz.coffeepot.timeProperty
 import java.awt.BorderLayout
 import java.awt.BorderLayout.CENTER
+import java.awt.Font
+import java.awt.GridBagConstraints
+import java.awt.GridBagLayout
 import javax.swing.BoxLayout
 import javax.swing.JButton
 import javax.swing.JLabel
@@ -49,8 +53,17 @@ enum class Panes(val title: String, val pane: () -> JPanel) {
 
 val clockPane: JPanel
     get() = JPanel().apply {
-        layout = BorderLayout()
-        add(JLabel("C"), CENTER)
+        layout = GridBagLayout()
+        val timeLabel = JLabel(timeProperty.value)
+        timeProperty.registerListener { _, new ->
+            timeLabel.text = new
+            validate()
+        }
+        timeLabel.font = Font("Raleway", Font.BOLD, 80)
+        add(timeLabel, GridBagConstraints().apply { gridy = 0 })
+        val weatherLabel = JLabel("Zimno jest")
+        weatherLabel.font = Font("Raleway", Font.PLAIN, 30)
+        add(weatherLabel, GridBagConstraints().apply { gridy = 1 })
     }
 
 val weatherPane: JPanel
