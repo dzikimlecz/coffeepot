@@ -5,7 +5,6 @@ import java.awt.Dimension
 import java.awt.event.WindowAdapter
 import java.awt.event.WindowEvent
 import javax.swing.JFrame
-import javax.swing.UIManager
 import kotlin.system.exitProcess
 
 fun main(args: Array<String>) {
@@ -14,9 +13,8 @@ fun main(args: Array<String>) {
 }
 
 fun init() {
-    try {
-        UIManager.setLookAndFeel("com.sun.java.swing.plaf.gtk.GTKLookAndFeel")
-    } catch (_: Exception) {}
+    System.setProperty("swing.aatext", "true")
+    System.setProperty("awt.useSystemAAFontSettings", "on")
     startDaemon()
 }
 
@@ -25,6 +23,7 @@ fun launchApp(args: Array<String>) {
     with(mainFrame) {
         contentPane = mainPane
         if ("--debug" in args) {
+            println("debug")
             maximumSize = Dimension(480, 320)
         }
         addWindowListener(object : WindowAdapter() {
