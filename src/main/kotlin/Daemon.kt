@@ -37,7 +37,7 @@ fun startDaemon() {
                         "HH:mm"
                     )
                 )
-
+                time.value = timeStr
             },
             0, 5,
             SECONDS
@@ -68,7 +68,9 @@ private lateinit var executor: ScheduledExecutorService
 // TIME
 ///////////////////////////////////////////////////////////////////////////
 
+private val time = MutableObservable("")
 
+val timeProperty: Observable<String> = time
 
 ///////////////////////////////////////////////////////////////////////////
 // WEATHER
