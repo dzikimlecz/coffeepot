@@ -24,7 +24,12 @@ fun launchApp(args: Array<String>) {
         if ("--debug" in args) {
             maximumSize = Dimension(480, 320)
         }
-
+        addWindowListener(object : WindowAdapter() {
+            override fun windowClosing(e: WindowEvent?) {
+                stopDaemon()
+                exitProcess(0)
+            }
+        })
         isVisible = true
     }
 
