@@ -1,7 +1,7 @@
 package me.dzikimlecz.coffeepot
 
 private typealias Listener<T> = (T, T) -> Unit
-class Observable<T>(value: T) {
+class MutableObservable<T>(value: T) {
     var value: T = value
         set(new) {
             if (new == field) {
@@ -18,7 +18,7 @@ class Observable<T>(value: T) {
         if (this === other) return true
         if (javaClass != other?.javaClass) return false
 
-        other as Observable<*>
+        other as MutableObservable<*>
 
         return value == other.value
     }
@@ -35,10 +35,10 @@ class Observable<T>(value: T) {
 
     fun dropListeners() = changeListeners.clear()
 
-    private var boundTo: Observable<T>? = null
+    private var boundTo: MutableObservable<T>? = null
     val isBound = boundTo != null
 
-    fun bind(other: Observable<T>) {
+    fun bind(other: MutableObservable<T>) {
         other.registerListener { _, new ->
             if(this.boundTo === other) {
                 this.value = new

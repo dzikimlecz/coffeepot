@@ -1,6 +1,6 @@
 package me.dzikimlecz.coffeepot.gui
 
-import me.dzikimlecz.coffeepot.Observable
+import me.dzikimlecz.coffeepot.MutableObservable
 import me.dzikimlecz.coffeepot.gui.Panes.CLOCK
 import java.awt.BorderLayout
 import java.awt.BorderLayout.CENTER
@@ -10,7 +10,7 @@ import javax.swing.JLabel
 import javax.swing.JPanel
 import javax.swing.text.View.X_AXIS
 
-private val currentPane = Observable(CLOCK)
+private val currentPane = MutableObservable(CLOCK)
 
 val mainPane: JPanel by lazy {
     JPanel().apply {
