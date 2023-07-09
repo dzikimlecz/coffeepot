@@ -1,8 +1,18 @@
 package me.dzikimlecz.coffeepot
 
 private typealias Listener<T> = (T, T) -> Unit
-class MutableObservable<T>(value: T) {
-    var value: T = value
+
+interface Observable<T> {
+
+    val value: T
+    fun registerListener(listener: Listener<T>)
+
+    fun dropListeners()
+}
+
+
+class MutableObservable<T>(value: T) : Observable<T> {
+    override var value: T = value
         set(new) {
             if (new == field) {
                 return
@@ -29,11 +39,11 @@ class MutableObservable<T>(value: T) {
 
     private val changeListeners: MutableList<Listener<T>> = mutableListOf()
 
-    fun registerListener(listener: Listener<T>) {
+    override fun registerListener(listener: Listener<T>) {
         changeListeners += listener
     }
 
-    fun dropListeners() = changeListeners.clear()
+    override fun dropListeners() = changeListeners.clear()
 
     private var boundTo: MutableObservable<T>? = null
     val isBound = boundTo != null
