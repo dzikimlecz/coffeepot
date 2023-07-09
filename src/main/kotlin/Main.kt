@@ -10,15 +10,14 @@ import kotlin.system.exitProcess
 
 fun main(args: Array<String>) {
     init()
-    startDaemon()
     launchApp(args)
-
 }
 
 fun init() {
     try {
         UIManager.setLookAndFeel("com.sun.java.swing.plaf.gtk.GTKLookAndFeel")
     } catch (_: Exception) {}
+    startDaemon()
 }
 
 fun launchApp(args: Array<String>) {
