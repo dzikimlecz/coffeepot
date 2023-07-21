@@ -5,13 +5,9 @@ import me.dzikimlecz.coffeepot.gui.Panes.CLOCK
 import me.dzikimlecz.coffeepot.timeProperty
 import java.awt.*
 import java.awt.BorderLayout.CENTER
-import javax.swing.BoxLayout
 import javax.swing.JButton
 import javax.swing.JLabel
 import javax.swing.JPanel
-import javax.swing.JToolBar
-import javax.swing.text.View.HORIZONTAL
-import javax.swing.text.View.X_AXIS
 
 private val currentPane = MutableObservable(CLOCK)
 
@@ -39,10 +35,6 @@ val modeSelector: JPanel by lazy {
                     font = Font("Sans", Font.PLAIN, 20)
                     background = Color.BLACK
                     foreground = Color.WHITE
-                    add(JPanel().apply {
-                        size = Dimension(400, 40)
-                    })
-
                 }
             )
         }
