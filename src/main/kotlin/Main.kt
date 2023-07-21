@@ -18,11 +18,20 @@ fun init() {
     startDaemon()
 }
 
+val debugOn: Boolean
+    get() = debug ?: false
+
+private var debug: Boolean? = null
+
 fun launchApp(args: Array<String>) {
+    if (debug != null) {
+        throw IllegalStateException("Application has already been started")
+    }
+    debug = "--debug" in args
     val mainFrame = JFrame("coffeepot")
     with(mainFrame) {
         contentPane = mainPane
-        if ("--debug" in args) {
+        if (debugOn) {
             println("debug")
             maximumSize = Dimension(480, 320)
         }
