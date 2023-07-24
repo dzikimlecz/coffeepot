@@ -38,14 +38,11 @@ val mainPane: JPanel by lazy {
 val modeSelector: JPanel by lazy {
     JPanel().apply {
         layout = FlowLayout()
-        background = Color.BLACK
         for (pane in Panes.values()) {
             add(
                 JButton(pane.title).apply {
                     addActionListener { currentPane.value = pane }
                     font = Font("Sans", Font.PLAIN, 20)
-                    background = Color.BLACK
-                    foreground = Color.WHITE
                 }
             )
         }
@@ -63,7 +60,6 @@ enum class Panes(val title: String, val pane: () -> JPanel) {
 
 val clockPane: JPanel
     get() = JPanel().apply {
-        background = Color.BLACK
         layout = GridBagLayout()
         val timeLabel = JLabel(timeProperty.value)
         timeProperty.registerListener { _, new ->
@@ -78,7 +74,7 @@ val clockPane: JPanel
             weatherLabel.text = new
             invalidate()
         }
-        weatherLabel.font = Font("", Font.PLAIN, 30)
+        weatherLabel.font = Font("Sans", Font.PLAIN, 30)
         weatherLabel.foreground = Color.WHITE
         add(weatherLabel, GridBagConstraints().apply { gridy = 1 })
     }
