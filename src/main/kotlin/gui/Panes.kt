@@ -68,13 +68,17 @@ val clockPane: JPanel
         val timeLabel = JLabel(timeProperty.value)
         timeProperty.registerListener { _, new ->
             timeLabel.text = new
-            validate()
+            invalidate()
         }
         timeLabel.font = Font("Raleway", Font.BOLD, 80)
         timeLabel.foreground = Color.WHITE
         add(timeLabel, GridBagConstraints().apply { gridy = 0 })
-        val weatherLabel = JLabel("Zimno jest")
-        weatherLabel.font = Font("Raleway", Font.PLAIN, 30)
+        val weatherLabel = JLabel(weatherProperty.value)
+        weatherProperty.registerListener { _, new ->
+            weatherLabel.text = new
+            invalidate()
+        }
+        weatherLabel.font = Font("", Font.PLAIN, 30)
         weatherLabel.foreground = Color.WHITE
         add(weatherLabel, GridBagConstraints().apply { gridy = 1 })
     }
