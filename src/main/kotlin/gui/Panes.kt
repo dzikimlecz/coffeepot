@@ -3,11 +3,18 @@ package me.dzikimlecz.coffeepot.gui
 import me.dzikimlecz.coffeepot.MutableObservable
 import me.dzikimlecz.coffeepot.gui.Panes.CLOCK
 import me.dzikimlecz.coffeepot.timeProperty
+import me.dzikimlecz.coffeepot.weatherImageProperty
+import me.dzikimlecz.coffeepot.weatherProperty
 import java.awt.*
 import java.awt.BorderLayout.CENTER
+import java.awt.event.MouseEvent
+import java.awt.event.MouseMotionListener
+import javax.swing.ImageIcon
 import javax.swing.JButton
 import javax.swing.JLabel
 import javax.swing.JPanel
+import javax.swing.JScrollPane
+import javax.swing.OverlayLayout
 
 private val currentPane = MutableObservable(CLOCK)
 
@@ -15,9 +22,13 @@ val mainPane: JPanel by lazy {
     JPanel().apply {
         layout = BorderLayout()
         add(modeSelector, BorderLayout.SOUTH)
-        add(clockPane, CENTER)
-        currentPane.registerListener { old, new ->
-            remove(old.pane())
+        add(currentPane.value.pane(), CENTER)
+        currentPane.registerListener { _, new ->
+            removeAll()
+            timeProperty.dropListeners()
+            weatherProperty.dropListeners()
+            weatherImageProperty.dropListeners()
+            add(modeSelector, BorderLayout.SOUTH)
             add(new.pane(), CENTER)
             validate()
         }
@@ -70,8 +81,32 @@ val clockPane: JPanel
 
 val weatherPane: JPanel
     get() = JPanel().apply {
-        layout = BorderLayout()
-        add(JLabel("W"), CENTER)
+        layout = OverlayLayout(this)
+        val icon = ImageIcon(weatherImageProperty.value)
+        weatherImageProperty.registerListener { _, new ->
+            icon.image = new
+            invalidate()
+        }
+        val jLabel = JLabel(icon).apply {
+            autoscrolls = true
+            addMouseMotionListener(object : MouseMotionListener {
+                override fun mouseDragged(e: MouseEvent?) {
+                    if (e != null) {
+                        scrollRectToVisible(
+                            Rectangle(
+                                e.x, e.y,
+                                1, 1
+                            )
+                        )
+                    }
+                }
+
+                override fun mouseMoved(e: MouseEvent?) {}
+            })
+        }
+        add(JScrollPane(jLabel).apply {
+
+        })
     }
 
 val transitPane: JPanel
