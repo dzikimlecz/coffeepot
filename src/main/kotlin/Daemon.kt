@@ -1,11 +1,13 @@
 package me.dzikimlecz.coffeepot
 
 
+import me.dzikimlecz.coffeepot.transit.Service
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.Response
 import java.awt.image.BufferedImage
 import java.io.IOException
+import java.time.LocalDateTime
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 import java.util.concurrent.Executors
@@ -143,6 +145,15 @@ private fun failFetchingWeather(
     throw IOException("Couldn't fetch weather for $location")
 }
 
+///////////////////////////////////////////////////////////////////////////
+// Transit
+///////////////////////////////////////////////////////////////////////////
 
+val servicesProperty: ObservableList<Service>
+    get() = services
+private val services: ObservableMutableList<Service> =
+    observableMutableListOf(
+        Service("null", "null", "null",
+            LocalDateTime.MIN))
 
 
