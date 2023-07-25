@@ -109,8 +109,8 @@ val weatherPane: JPanel
         })
     }
 
-val transitPane: JPanel
-    get() = JPanel().apply {
-        layout = BorderLayout()
-        add(JLabel("T"), CENTER)
-    }
+
+
+
+
+
