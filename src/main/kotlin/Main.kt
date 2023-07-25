@@ -13,8 +13,10 @@ fun main(args: Array<String>) {
 }
 
 fun init() {
-    System.setProperty("swing.aatext", "true")
-    System.setProperty("awt.useSystemAAFontSettings", "on")
+    System.setProperty(
+        "swing.aatext", "true")
+    System.setProperty(
+        "awt.useSystemAAFontSettings", "on")
     System.setProperty(
         "swing.defaultlaf", "com.sun.java.swing.plaf.gtk.GTKLookAndFeel")
     startDaemon()
