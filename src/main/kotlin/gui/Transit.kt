@@ -6,6 +6,8 @@ import java.awt.BorderLayout
 import java.awt.BorderLayout.CENTER
 import java.awt.FlowLayout
 import java.awt.Font
+import java.awt.GridBagConstraints
+import java.awt.GridBagLayout
 import java.time.format.DateTimeFormatter
 import javax.swing.BoxLayout
 import javax.swing.JLabel
@@ -20,7 +22,7 @@ val transitPane: JPanel
 
 val servicesContainer: JPanel
     get() = JPanel().apply {
-        layout = BoxLayout(this, Y_AXIS)
+        layout = GridBagLayout()
         var maxIndex = addServices()
         servicesProperty.registerOnCleared {
             removeAll()
@@ -32,14 +34,24 @@ val servicesContainer: JPanel
             invalidate()
         }
         servicesProperty.registerOnElementAdded {
-            add(servicePane(it), ++maxIndex)
+            add(servicePane(it), GridBagConstraints().apply {
+                gridx = 0
+                ipadx = 10
+                ipady = 5
+                gridy = ++maxIndex
+            })
             invalidate()
         }
     }
 
 private fun JPanel.addServices(): Int {
     for ((i, service) in servicesProperty.withIndex()) {
-        add(servicePane(service), i)
+        add(servicePane(service), GridBagConstraints().apply {
+            gridx = 0
+            ipadx = 10
+            ipady = 5
+            gridy = i
+        })
     }
     return servicesProperty.lastIndex
 }
