@@ -5,17 +5,12 @@ import java.time.LocalDate
 import java.time.LocalTime
 import javax.persistence.*
 
-@Entity @Table(name = "trips")
-data class Trip (
-    @Id @Column(name = "trip_id")
-    val id: String,
-    @ManyToOne @JoinColumn(name = "calendar_id")
-    val calendarId: String,
-    @ManyToOne @JoinColumn(name = "calendar_id")
-    val routeId: String,
-    val tripHeadsign: String,
-    val direction: Direction,
-    val wheelchairAccessible: Boolean,
+data class Gtfs(
+    val trips: List<Trip>,
+    val routes: List<Route>,
+    val stops: List<Stop>,
+    val stopTimes: List<StopTime>,
+    val calendars: List<Calendar>,
 )
 
 @Entity @Table(name = "routes")
@@ -28,6 +23,19 @@ data class Route(
     val vehicle: Vehicle,
     val color: String,
     val textColor: String,
+)
+
+@Entity @Table(name = "trips")
+data class Trip (
+    @Id @Column(name = "trip_id")
+    val id: String,
+    @ManyToOne @JoinColumn(name = "calendar_id")
+    val calendarId: String,
+    @ManyToOne @JoinColumn(name = "calendar_id")
+    val routeId: String,
+    val tripHeadsign: String,
+    val direction: Direction,
+    val wheelchairAccessible: Boolean,
 )
 
 @Entity @Table(name = "stops")
@@ -123,11 +131,3 @@ enum class StopHandlingMode {
     IMPOSSIBLE,
     ON_DEMAND,
 }
-
-data class Gtfs(
-    val trips: List<Trip>,
-    val routes: List<Route>,
-    val stops: List<Stop>,
-    val stopTimes: List<StopTime>,
-    val calendars: List<Calendar>,
-)
