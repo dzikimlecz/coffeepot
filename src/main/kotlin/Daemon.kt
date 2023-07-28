@@ -1,11 +1,14 @@
 package me.dzikimlecz.coffeepot
 
 
-import me.dzikimlecz.coffeepot.transit.Service
+import me.dzikimlecz.coffeepot.transit.Gtfs
+import me.dzikimlecz.coffeepot.transit.UpcomingService
+import me.dzikimlecz.coffeepot.transit.unzipTo
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.Response
 import java.awt.image.BufferedImage
+import java.io.File
 import java.io.IOException
 import java.time.LocalDateTime
 import java.time.LocalTime
@@ -14,6 +17,7 @@ import java.util.concurrent.Executors
 import java.util.concurrent.ScheduledExecutorService
 import java.util.concurrent.TimeUnit.MINUTES
 import java.util.concurrent.TimeUnit.SECONDS
+import java.util.zip.ZipInputStream
 import javax.imageio.ImageIO
 
 ///////////////////////////////////////////////////////////////////////////
@@ -149,11 +153,15 @@ private fun failFetchingWeather(
 // Transit
 ///////////////////////////////////////////////////////////////////////////
 
-val servicesProperty: ObservableList<Service>
+
+val servicesProperty: ObservableList<UpcomingService>
     get() = services
-private val services: ObservableMutableList<Service> =
+private val services: ObservableMutableList<UpcomingService> =
     observableMutableListOf(
-        Service("null", "null", "null",
-            LocalDateTime.MIN))
+        UpcomingService("null", "null", "null",
+            LocalDateTime.MIN),
+        UpcomingService("null", "null", "null",
+            LocalDateTime.MIN),
+        )
 
 
