@@ -20,14 +20,14 @@ dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter:5.9.2")
     testImplementation("org.junit.jupiter:junit-jupiter:5.9.2")
 
-    val oneBusAwayVersion = "1.3.4"
-    implementation("org.onebusaway:onebusaway-gtfs:$oneBusAwayVersion")
-    implementation("org.onebusaway:onebusaway-gtfs-hibernate:$oneBusAwayVersion")
-
+    implementation("org.apache.commons:commons-csv:1.10.0")
     implementation("org.xerial:sqlite-jdbc:3.42.0.0")
     implementation("com.github.gwenn:sqlite-dialect:0.1.4")
-    implementation("javax.transaction:jta:1.1")
-    implementation("org.hibernate:hibernate-annotations:3.3.1.GA")
+    implementation("org.hibernate:hibernate-core:6.2.7.Final")
+    implementation("org.hibernate:hibernate-annotations:3.5.6-Final")
+
+    runtimeOnly("org.slf4j:slf4j-api:2.0.5")
+    runtimeOnly("org.slf4j:slf4j-simple:2.0.5")
 
     implementation(platform("com.squareup.okhttp3:okhttp-bom:4.11.0"))
     implementation("com.squareup.okhttp3:okhttp")
