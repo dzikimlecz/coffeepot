@@ -1,7 +1,7 @@
 package me.dzikimlecz.coffeepot.gui
 
 import me.dzikimlecz.coffeepot.servicesProperty
-import me.dzikimlecz.coffeepot.transit.Service
+import me.dzikimlecz.coffeepot.transit.UpcomingService
 import java.awt.BorderLayout
 import java.awt.BorderLayout.CENTER
 import java.awt.FlowLayout
@@ -9,10 +9,8 @@ import java.awt.Font
 import java.awt.GridBagConstraints
 import java.awt.GridBagLayout
 import java.time.format.DateTimeFormatter
-import javax.swing.BoxLayout
 import javax.swing.JLabel
 import javax.swing.JPanel
-import javax.swing.text.View.Y_AXIS
 
 val transitPane: JPanel
     get() = JPanel().apply {
@@ -57,7 +55,7 @@ private fun JPanel.addServices(): Int {
 }
 
 
-fun servicePane(service: Service) = JPanel().apply {
+fun servicePane(service: UpcomingService) = JPanel().apply {
     layout = FlowLayout()
 
     val lineLabel = JLabel(service.line)
