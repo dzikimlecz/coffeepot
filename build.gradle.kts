@@ -17,8 +17,8 @@ repositories {
 
 dependencies {
     testImplementation(kotlin("test"))
-    testImplementation("org.junit.jupiter:junit-jupiter:5.8.1")
-    testImplementation("org.junit.jupiter:junit-jupiter:5.8.1")
+    testImplementation("org.junit.jupiter:junit-jupiter:5.9.2")
+    testImplementation("org.junit.jupiter:junit-jupiter:5.9.2")
 
     val oneBusAwayVersion = "1.3.4"
     implementation("org.onebusaway:onebusaway-gtfs:$oneBusAwayVersion")
