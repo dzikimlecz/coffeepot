@@ -3,7 +3,7 @@ import org.panteleyev.jpackage.ImageType
 import org.panteleyev.jpackage.JPackageTask
 
 plugins {
-    kotlin("jvm") version "1.8.21"
+    kotlin("jvm") version "1.8.20"
     application
     id("org.panteleyev.jpackageplugin") version "1.5.2"
 }
@@ -20,11 +20,8 @@ dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter:5.9.2")
     testImplementation("org.junit.jupiter:junit-jupiter:5.9.2")
 
-    implementation("org.apache.commons:commons-csv:1.10.0")
     implementation("org.xerial:sqlite-jdbc:3.42.0.0")
     implementation("com.github.gwenn:sqlite-dialect:0.1.4")
-    implementation("org.hibernate:hibernate-core:6.2.7.Final")
-    implementation("org.hibernate:hibernate-annotations:3.5.6-Final")
 
     runtimeOnly("org.slf4j:slf4j-api:2.0.5")
     runtimeOnly("org.slf4j:slf4j-simple:2.0.5")
@@ -32,6 +29,8 @@ dependencies {
     implementation(platform("com.squareup.okhttp3:okhttp-bom:4.11.0"))
     implementation("com.squareup.okhttp3:okhttp")
     implementation("com.squareup.okhttp3:logging-interceptor")
+
+    implementation(project(":libgtfskt-core"))
 }
 
 tasks.test {
@@ -58,6 +57,7 @@ tasks.register<Jar>("uberJar") {
     from(sourceSets.main.get().output)
 
     dependsOn(configurations.runtimeClasspath)
+    dependsOn(tasks.build)
     from({
         configurations.runtimeClasspath.get()
             .filter { it.name.endsWith("jar") }
@@ -74,6 +74,6 @@ tasks.withType<JPackageTask> {
     type = ImageType.APP_IMAGE
     appName = "coffeepot"
     appVersion = version.toString()
-    input = "build/libs/uber"
+    input = "build/libs"
     mainJar = "coffeepot-$appVersion-uber.jar"
 }
