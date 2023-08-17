@@ -4,18 +4,17 @@ import me.dzikimlecz.coffeepot.Resources.appDirectory
 import me.dzikimlecz.coffeepot.transit.sha256
 import me.dzikimlecz.coffeepot.transit.unzipTo
 import me.dzikimlecz.coffeepot.transit.writeTo
-import me.dzikimlecz.libgtfskt.FeedProcessor
-import me.dzikimlecz.libgtfskt.UpcomingService
-import me.dzikimlecz.libgtfskt.feedProcessor
-import me.dzikimlecz.libgtfskt.getFeed
+import me.dzikimlecz.libgtfskt.*
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.Response
 import java.awt.image.BufferedImage
 import java.io.File
 import java.io.IOException
+import java.time.LocalDate
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
+import java.time.temporal.ChronoUnit
 import java.util.concurrent.Executors
 import java.util.concurrent.ScheduledExecutorService
 import java.util.concurrent.TimeUnit.*
@@ -220,7 +219,16 @@ private lateinit var feedReader: FeedProcessor
 
 private fun readTransitFeed() {
     val feed = getFeed(File(appDirectory, ".cache"))
-    feedReader = feedProcessor(feed)
+    val feedUpToDate = feedUpToDate(feed)
+    if (feedUpToDate != false) {
+        feedReader = feedProcessor(feed)
+    } else {
+        val daysUntil = LocalDate.now()
+            .until(feed.feedInfos.first().feedStartDate, ChronoUnit.DAYS)
+        executor.schedule({
+            feedReader = feedProcessor(feed)
+        }, daysUntil, DAYS)
+    }
     services.clear()
 }
 
@@ -284,3 +292,15 @@ private fun failFetching(
 
     throw if (cause != null) IOException(message, cause) else IOException(message)
 }
+
+private fun feedUpToDate(feed: GtfsFeed): Boolean? {
+    val feedInfo = feed.feedInfos.firstOrNull() ?: return null
+    val now = LocalDate.now()
+    val startDate = feedInfo.feedStartDate
+    val endDate = feedInfo.feedEndDate
+    return if (startDate == null || endDate == null) null
+    else now.isBetween(startDate, endDate)
+}
+
+private fun LocalDate.isBetween(start: LocalDate, end: LocalDate) =
+    equals(start) || (isAfter(start) && isBefore(end))
