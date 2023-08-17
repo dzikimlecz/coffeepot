@@ -1,16 +1,15 @@
 package me.dzikimlecz.coffeepot.gui
 
 import me.dzikimlecz.coffeepot.servicesProperty
-import me.dzikimlecz.coffeepot.transit.UpcomingService
-import java.awt.BorderLayout
+import me.dzikimlecz.libgtfskt.UpcomingService
+import java.awt.*
+
 import java.awt.BorderLayout.CENTER
-import java.awt.FlowLayout
-import java.awt.Font
-import java.awt.GridBagConstraints
-import java.awt.GridBagLayout
 import java.time.format.DateTimeFormatter
 import javax.swing.JLabel
 import javax.swing.JPanel
+import javax.swing.JScrollPane
+import javax.swing.OverlayLayout
 
 val transitPane: JPanel
     get() = JPanel().apply {
@@ -20,59 +19,100 @@ val transitPane: JPanel
 
 val servicesContainer: JPanel
     get() = JPanel().apply {
-        layout = GridBagLayout()
-        var maxIndex = addServices()
-        servicesProperty.registerOnCleared {
-            removeAll()
-            invalidate()
-        }
-        servicesProperty.registerOnElementRemoved {
-            removeAll()
-            maxIndex = addServices()
-            invalidate()
-        }
-        servicesProperty.registerOnElementAdded {
-            add(servicePane(it), GridBagConstraints().apply {
-                gridx = 0
-                ipadx = 10
-                ipady = 5
-                gridy = ++maxIndex
-            })
-            invalidate()
-        }
+        layout = OverlayLayout(this)
+        add(JScrollPane(
+            JPanel().apply {
+                layout = GridBagLayout()
+                addServices()
+                servicesProperty.registerOnCleared {
+                    removeAll()
+                    invalidate()
+                }
+                servicesProperty.registerOnElementRemoved {
+                    removeAll()
+                    addServices()
+                    invalidate()
+                }
+                servicesProperty.registerOnElementAdded {
+                    removeAll()
+                    addServices()
+                    invalidate()
+                }
+            }
+        ))
     }
 
 private fun JPanel.addServices(): Int {
-    for ((i, service) in servicesProperty.withIndex()) {
-        add(servicePane(service), GridBagConstraints().apply {
+    var i = 0
+    val groupedByStop = servicesProperty.groupBy {
+        it.stop.code to it.stop.name
+    }
+    for ((stop, services) in groupedByStop) {
+        val (code, name) = stop
+        val stopLabel = JLabel("$name ($code)").apply {
+            font = raleway.deriveFont(30f)
+        }
+        add(stopLabel, GridBagConstraints().apply {
             gridx = 0
-            ipadx = 10
+            ipadx = 5
             ipady = 5
             gridy = i
+            weighty = 3.0
         })
-    }
-    return servicesProperty.lastIndex
-}
-
-
-fun servicePane(service: UpcomingService) = JPanel().apply {
-    layout = FlowLayout()
-
-    val lineLabel = JLabel(service.line)
-    val directionLabel = JLabel(service.direction)
-    val departureLabel = JLabel(
-        service.departure.format(DateTimeFormatter.ofPattern("HH:mm"))
-    )
-    val stopLabel = JLabel("(${service.stop})")
-    add(lineLabel)
-    add(directionLabel)
-    add(departureLabel)
-    add(stopLabel)
-    components.forEach {
-        if (it is JLabel) {
-            it.font = Font("Raleway", Font.BOLD, 20)
+        i += 3
+        for (service in services) {
+            add(servicePane(service), GridBagConstraints().apply {
+                gridx = 0
+                ipadx = 10
+                ipady = 5
+                gridy = i++
+            })
         }
     }
+    return i
 }
 
+fun servicePane(service: UpcomingService) =
+    JPanel().apply {
+        layout = FlowLayout()
+        val color =
+            try { Color.decode("#${service.line.color}") }
+            catch(_: Exception) { Color.DARK_GRAY }
+        val name = service.line.shortName.ifEmpty { service.line.longName }
+        val serviceDesc = buildString {
+            append(
+                service.departure
+                    .format(DateTimeFormatter.ofPattern("HH:mm"))
+            )
+            append(" — ")
+            append(name)
+            append(" >> ")
+            append(service.direction)
+        }
+        val lineLabel = JLabel(serviceDesc)
 
+        add(ColorDot(color))
+        add(lineLabel)
+        components.forEach {
+            if (it is JLabel) {
+                it.font = raleway
+            }
+        }
+    }
+
+private val raleway = Font("Raleway", Font.BOLD, 25)
+
+private class ColorDot(val color: Color) : JPanel() {
+    override fun paint(g: Graphics?) {
+        super.paint(g)
+        g?.color = color
+        g?.fillOval(0, 0, 15, 15)
+    }
+
+    init {
+        layout = OverlayLayout(this)
+        add(JLabel(" ".repeat(3)).apply {
+            font = raleway
+        })
+    }
+}
