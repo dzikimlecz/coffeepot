@@ -6,6 +6,8 @@ import java.awt.*
 
 import java.awt.BorderLayout.CENTER
 import java.time.format.DateTimeFormatter
+import java.util.concurrent.Executors
+import java.util.concurrent.TimeUnit
 import javax.swing.JLabel
 import javax.swing.JPanel
 import javax.swing.JScrollPane
@@ -14,32 +16,27 @@ import javax.swing.OverlayLayout
 val transitPane: JPanel
     get() = JPanel().apply {
         layout = BorderLayout()
-        add(servicesContainer, CENTER)
+        add(JScrollPane(servicesContainer), CENTER)
     }
 
 val servicesContainer: JPanel
     get() = JPanel().apply {
-        layout = OverlayLayout(this)
-        add(JScrollPane(
-            JPanel().apply {
-                layout = GridBagLayout()
-                addServices()
-                servicesProperty.registerOnCleared {
-                    removeAll()
-                    invalidate()
-                }
-                servicesProperty.registerOnElementRemoved {
-                    removeAll()
-                    addServices()
-                    invalidate()
-                }
-                servicesProperty.registerOnElementAdded {
-                    removeAll()
-                    addServices()
-                    invalidate()
-                }
-            }
-        ))
+        layout = GridBagLayout()
+        addServices()
+        servicesProperty.registerOnCleared {
+            removeAll()
+            invalidate()
+        }
+        servicesProperty.registerOnElementRemoved {
+            removeAll()
+            startUpdate()
+            invalidate()
+        }
+        servicesProperty.registerOnElementAdded {
+            removeAll()
+            startUpdate()
+            invalidate()
+        }
     }
 
 private fun JPanel.addServices(): Int {
