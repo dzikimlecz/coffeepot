@@ -1,28 +1,32 @@
 package me.dzikimlecz.coffeepot
 
-
-import me.dzikimlecz.coffeepot.transit.Gtfs
-import me.dzikimlecz.coffeepot.transit.UpcomingService
+import me.dzikimlecz.coffeepot.Resources.appDirectory
+import me.dzikimlecz.coffeepot.transit.sha256
 import me.dzikimlecz.coffeepot.transit.unzipTo
+import me.dzikimlecz.coffeepot.transit.writeTo
+import me.dzikimlecz.libgtfskt.FeedProcessor
+import me.dzikimlecz.libgtfskt.UpcomingService
+import me.dzikimlecz.libgtfskt.feedProcessor
+import me.dzikimlecz.libgtfskt.getFeed
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.Response
 import java.awt.image.BufferedImage
 import java.io.File
 import java.io.IOException
-import java.time.LocalDateTime
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 import java.util.concurrent.Executors
 import java.util.concurrent.ScheduledExecutorService
-import java.util.concurrent.TimeUnit.MINUTES
-import java.util.concurrent.TimeUnit.SECONDS
-import java.util.zip.ZipInputStream
+import java.util.concurrent.TimeUnit.*
+import java.util.stream.Collectors
 import javax.imageio.ImageIO
 
 ///////////////////////////////////////////////////////////////////////////
 // DAEMON
 ///////////////////////////////////////////////////////////////////////////
+
+private val http = OkHttpClient()
 
 fun startDaemon() {
     if (::executor.isInitialized && !executor.isShutdown) {
@@ -41,7 +45,14 @@ fun startDaemon() {
                 }
         }
     }
+    // try to read current feed.
+    try {
+        readTransitFeed()
+    } catch(e: Exception) {
+        println(e.message)
+    }
     with(executor) {
+        // update time every 5 seconds.
         scheduleAtFixedRate(
             {
                 val timeStr = LocalTime.now().format(
@@ -54,6 +65,7 @@ fun startDaemon() {
             0, 5,
             SECONDS
         )
+        // check weather every half an hour.
         scheduleAtFixedRate(
             {
                 try {
@@ -66,6 +78,34 @@ fun startDaemon() {
                 }
             },
             0, 30,
+            MINUTES
+        )
+        // check for feed updates every day.
+        scheduleAtFixedRate(
+            {
+                try {
+                    val feedUpdated = fetchTransitFeed()
+                    if (feedUpdated) {
+                        readTransitFeed()
+                        getUpcomingServices()
+                    }
+                } catch (e: Exception) {
+                    println(e.message)
+                }
+            },
+            1, 1,
+            DAYS
+        )
+        // Check for upcoming services every 2 minutes
+        scheduleAtFixedRate(
+            {
+                try {
+                    getUpcomingServices()
+                } catch (e: Exception) {
+                    println(e.message)
+                }
+            },
+            0, 2,
             MINUTES
         )
     }
@@ -92,7 +132,6 @@ val timeProperty: Observable<String> = time
 // WEATHER
 ///////////////////////////////////////////////////////////////////////////
 
-private val http = OkHttpClient()
 
 val weatherProperty: Observable<String>
     get() = weather
@@ -102,52 +141,41 @@ val weatherImageProperty: Observable<BufferedImage>
     get() = weatherImage
 private val weatherImage =
     MutableObservable<BufferedImage>(ImageIO.read(object {}.javaClass
-        .classLoader.getResource("w.png")))
+        .classLoader.getResource(Resources.weatherImagePath)))
 
 fun fetchWeatherImage(location: String) {
-    val request = Request.Builder()
-        .url("https://v2.wttr.in/$location.png")
-        .build()
-    val response: Response
-    try {
-        response = http.newCall(request).execute()
-    } catch (e: Exception) {
-        failFetchingWeather(location, e)
+    val url = "https://v2.wttr.in/$location.png"
+    val response = get(url) { e, code ->
+        failFetchingWeather(location, url, e, code)
     }
-    if (response.code != 200) {
-        failFetchingWeather(location)
-    }
-    val stream = response.body?.byteStream() ?: failFetchingWeather(location)
+    val stream = response.body?.byteStream() ?: failFetchingWeather(location, url)
     val img = ImageIO.read(stream)
+    response.close()
     weatherImage.value = img
 }
 
 fun getWeather(location: String) {
-    val request = Request.Builder()
-        .url("https://www.wttr.in/$location?format=3")
-        .build()
-    val response: Response
-    try {
-        response = http.newCall(request).execute()
-    } catch (e: Exception) {
-        failFetchingWeather(location, e)
+    val url = "https://www.wttr.in/$location?format=3"
+    val response: Response = get(url) { e, code ->
+        failFetchingWeather(location, url, e,  code)
     }
-    if (response.code != 200) {
-        failFetchingWeather(location)
-    }
-    val weather = response.body?.string() ?: failFetchingWeather(location)
-    me.dzikimlecz.coffeepot.weather.value = weather
+    val theWeather = response.body?.string() ?: failFetchingWeather(location, url)
+    response.close()
+    weather.value = theWeather
 }
 
 private fun failFetchingWeather(
     location: String,
-    e: Exception? = null
-): Nothing {
-    if (e != null) {
-        throw IOException("Couldn't fetch weather for $location", e)
-    }
-    throw IOException("Couldn't fetch weather for $location")
-}
+    url: String,
+    e: Exception? = null,
+    code: Int? = null
+): Nothing = failFetching(
+    "Couldn't fetch weather for $location",
+    url,
+    code,
+    e
+)
+
 
 ///////////////////////////////////////////////////////////////////////////
 // Transit
@@ -157,11 +185,102 @@ private fun failFetchingWeather(
 val servicesProperty: ObservableList<UpcomingService>
     get() = services
 private val services: ObservableMutableList<UpcomingService> =
-    observableMutableListOf(
-        UpcomingService("null", "null", "null",
-            LocalDateTime.MIN),
-        UpcomingService("null", "null", "null",
-            LocalDateTime.MIN),
-        )
+    observableMutableListOf()
 
+fun fetchTransitFeed(): Boolean {
+    val newArchive = downloadTransitFeed()
+    val currentArchive = File(appDirectory, "archive/transit.zip")
+    val feedChanged = sha256(currentArchive) != sha256(newArchive)
+    if (feedChanged) {
+        try {
+            newArchive unzipTo File(appDirectory, ".cache")
+            newArchive writeTo currentArchive
+            newArchive.delete()
+        } catch (e: Exception) {
+            throw IOException("Could not save GTFS feed.", e)
+        }
+    }
+    return feedChanged
+}
 
+private fun downloadTransitFeed(): File {
+    val url = Resources.transitFeedUrl
+    val response = get(url) { e, code ->
+        failFetching("Failed fetching GTFS feed", url, code, e)
+    }
+    val responseStream = response.body?.byteStream() ?: failFetchingWeather(
+        "Failed fetching GTFS feed", url, code = response.code)
+    val file = File(appDirectory, "archive/new.zip")
+    responseStream writeTo file
+    response.close()
+    return file
+}
+
+private lateinit var feedReader: FeedProcessor
+
+private fun readTransitFeed() {
+    val feed = getFeed(File(appDirectory, ".cache"))
+    feedReader = feedProcessor(feed)
+    services.clear()
+}
+
+private fun getUpcomingServices(): List<UpcomingService> {
+    if (!::feedReader.isInitialized) {
+        throw IllegalStateException("No feed has been read.")
+    }
+    val upcomingServices = Resources.trackedStops.stream()
+        .map(feedReader::getUpcomingServicesFor)
+        .flatMap(List<UpcomingService>::stream)
+        .collect(Collectors.toList())
+    services.retainAll(upcomingServices)
+    val newServices = (upcomingServices - services)
+        .sortedBy(UpcomingService::departure)
+    services += newServices
+    return newServices
+}
+
+///////////////////////////////////////////////////////////////////////////
+// UTIL
+///////////////////////////////////////////////////////////////////////////
+
+private fun get(url: String, onFail: (e: Exception?, code: Int?) -> Nothing): Response {
+    val request = Request.Builder()
+        .url(url)
+        .build()
+    val response: Response
+    try {
+        response = http.newCall(request).execute()
+    } catch (e: Exception) {
+        onFail(e, null)
+    }
+    if (!response.isSuccessful) {
+        onFail(null, response.code)
+    }
+    return response
+}
+
+private fun failFetching(
+    msg: String,
+    url: String,
+    code: Int? = null,
+    cause: Exception? = null,
+): Nothing {
+    val message = buildString {
+        append(msg)
+        append("; ")
+        if (code != null) {
+            append("Status: ")
+            append(code)
+            append("; ")
+        }
+        append("URL: ")
+        append(url)
+        if (cause != null) {
+            append("; Caused by: ")
+            append(cause.javaClass.name)
+        }
+        append('.')
+    }
+
+    throw if (cause != null) IOException(message, cause) else IOException(message)
+}
