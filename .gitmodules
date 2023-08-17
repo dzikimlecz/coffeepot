@@ -1,0 +1,3 @@
+[submodule "libgtfskt-core"]
+	path = libgtfskt-core
+	url = ./libgtfskt-core
