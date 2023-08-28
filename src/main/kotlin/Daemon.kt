@@ -237,7 +237,7 @@ private fun getUpcomingServices(): List<UpcomingService> {
         throw IllegalStateException("No feed has been read.")
     }
     val upcomingServices = Resources.trackedStopNames.stream()
-        .map(feedReader::getUpcomingServicesFor)
+        .map(feedReader::getUpcomingServicesForName)
         .flatMap(List<UpcomingService>::stream)
         .collect(Collectors.toList())
     services.retainAll(upcomingServices)
