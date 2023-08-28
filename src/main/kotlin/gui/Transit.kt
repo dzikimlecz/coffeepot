@@ -76,25 +76,21 @@ fun servicePane(service: UpcomingService) =
             try { Color.decode("#${service.line.color}") }
             catch(_: Exception) { Color.DARK_GRAY }
         val name = service.line.shortName.ifEmpty { service.line.longName }
-        val serviceDesc = buildString {
+        val lineSection = buildString {
             append(
                 service.departure
                     .format(DateTimeFormatter.ofPattern("HH:mm"))
             )
             append(" — ")
             append(name)
-            append(" >> ")
-            append(service.direction)
         }
-        val lineLabel = JLabel(serviceDesc)
 
         add(ColorDot(color))
-        add(lineLabel)
-        components.forEach {
-            if (it is JLabel) {
-                it.font = raleway
-            }
-        }
+        add(JLabel(lineSection).apply {  font = raleway })
+        add(JLabel(" ➟ ").apply {
+            font = font.deriveFont(raleway.size.toFloat())
+        })
+        add(JLabel(service.direction).apply { font = raleway })
     }
 
 private val raleway = Font("Raleway", Font.BOLD, 25)
@@ -113,3 +109,21 @@ private class ColorDot(val color: Color) : JPanel() {
         })
     }
 }
+
+private val updater = Executors.newScheduledThreadPool(1)
+private var updateRunning = false
+
+private fun startUpdate() {
+    if (updateRunning) return
+    updateRunning = true
+    updater.schedule( {
+        updateRunning = false
+        servicesContainer.removeAll()
+        servicesContainer.addServices()
+        servicesContainer.invalidate()
+    }, 500, TimeUnit.MILLISECONDS )
+}
+
+
+
+
