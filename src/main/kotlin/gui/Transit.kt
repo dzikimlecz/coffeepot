@@ -98,13 +98,19 @@ private val raleway = Font("Raleway", Font.BOLD, 25)
 private class ColorDot(val color: Color) : JPanel() {
     override fun paint(g: Graphics?) {
         super.paint(g)
-        g?.color = color
-        g?.fillOval(0, 0, 15, 15)
+        if (g != null) {
+            with(g) {
+                color = this@ColorDot.color
+                fillOval(0, 0, 20, 20)
+                color = Color.WHITE
+                drawOval(1, 1, 20, 20)
+            }
+        }
     }
 
     init {
         layout = OverlayLayout(this)
-        add(JLabel(" ".repeat(3)).apply {
+        add(JLabel(" ".repeat(4)).apply {
             font = raleway
         })
     }
