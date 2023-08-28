@@ -19,6 +19,7 @@ import java.util.concurrent.Executors
 import java.util.concurrent.ScheduledExecutorService
 import java.util.concurrent.TimeUnit.*
 import java.util.stream.Collectors
+import java.util.stream.Stream
 import javax.imageio.ImageIO
 
 ///////////////////////////////////////////////////////////////////////////
@@ -236,10 +237,19 @@ private fun getUpcomingServices(): List<UpcomingService> {
     if (!::feedReader.isInitialized) {
         throw IllegalStateException("No feed has been read.")
     }
-    val upcomingServices = Resources.trackedStopNames.stream()
+
+    val byCode = Resources.trackedStopCodes.stream()
+        .map(feedReader::getUpcomingServicesForCode)
+        .flatMap(List<UpcomingService>::stream)
+
+    val byName = Resources.trackedStopNames.stream()
         .map(feedReader::getUpcomingServicesForName)
         .flatMap(List<UpcomingService>::stream)
+
+    val upcomingServices = Stream.concat(byCode, byName)
+        .distinct()
         .collect(Collectors.toList())
+
     services.retainAll(upcomingServices)
     val newServices = (upcomingServices - services)
         .sortedBy(UpcomingService::departure)
