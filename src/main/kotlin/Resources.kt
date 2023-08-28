@@ -11,11 +11,6 @@ object Resources {
     val trackedStopCodes: List<String>
     val trackedStopNames: List<String>
 
-    // TODO: remove
-    val weatherImagePath: String = "w.png"
-    val trackedStops: List<String>
-        get() = trackedStopNames
-
     init {
 
         val configFile = File(

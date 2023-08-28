@@ -140,7 +140,7 @@ val weatherImageProperty: Observable<BufferedImage>
     get() = weatherImage
 private val weatherImage =
     MutableObservable<BufferedImage>(ImageIO.read(object {}.javaClass
-        .classLoader.getResource(Resources.weatherImagePath)))
+        .classLoader.getResource("w.png")))
 
 fun fetchWeatherImage(location: String) {
     val url = "https://v2.wttr.in/$location.png"
@@ -236,7 +236,7 @@ private fun getUpcomingServices(): List<UpcomingService> {
     if (!::feedReader.isInitialized) {
         throw IllegalStateException("No feed has been read.")
     }
-    val upcomingServices = Resources.trackedStops.stream()
+    val upcomingServices = Resources.trackedStopNames.stream()
         .map(feedReader::getUpcomingServicesFor)
         .flatMap(List<UpcomingService>::stream)
         .collect(Collectors.toList())
