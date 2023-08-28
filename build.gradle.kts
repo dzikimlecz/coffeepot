@@ -1,12 +1,9 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
-import org.panteleyev.jpackage.ImageType
-import org.panteleyev.jpackage.JPackageTask
 
 plugins {
     kotlin("jvm") version "1.8.20"
     application
-    id("org.panteleyev.jpackageplugin") version "1.5.2"
-}
+    }
 
 group = "me.dzikimlecz"
 version = "0.1"
@@ -70,10 +67,4 @@ tasks.withType<Copy> {
     duplicatesStrategy = DuplicatesStrategy.WARN
 }
 
-tasks.withType<JPackageTask> {
-    type = ImageType.APP_IMAGE
-    appName = "coffeepot"
-    appVersion = version.toString()
-    input = "build/libs"
-    mainJar = "coffeepot-$appVersion-uber.jar"
-}
+
