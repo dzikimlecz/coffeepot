@@ -72,6 +72,16 @@ private fun readProperties(configFile: File): Properties {
         "Location of weather services must be set."
     }
 
+    val path = properties["appDirectory"].toString()
+    with(File(path)) {
+        require(exists()) {
+            "Directory: $path does not exist."
+        }
+        require(isDirectory) {
+            "$path is not a directory."
+        }
+    }
+
     return properties
 }
 
