@@ -5,7 +5,7 @@ import java.util.Properties
 
 object Resources {
     val location: String
-    val locationCode: Pair<String, String>
+    val locationCode: Pair<String, String>?
     val transitFeedUrl: String
     val appDirectory: String
     val trackedStopCodes: List<String>
@@ -32,7 +32,7 @@ object Resources {
 
         locationCode = with(properties["locationCode"]!!.toString()) {
             if(isEmpty()) {
-                "" to ""
+                null
             } else {
                 val tokens = split(",")
                 check(tokens.size == 2) {
@@ -51,17 +51,16 @@ private fun readProperties(configFile: File): Properties {
     require(configFile.isFile) { "File ${configFile.path} is a directory." }
     require(configFile.canRead()) { "File ${configFile.path} is unreadable." }
 
-    val defaults = Properties().apply {
-        this["appDirectory"] =
-            System.getProperty("user.home") + "/.coffeepot"
-        this["locationCode"] = ""
-        this["stopNames"] = ""
-        this["stopCodes"] = ""
-        this["transitFeedUrl"] = ""
-    }
-
-    val properties = Properties(defaults)
-        .apply { load(configFile.inputStream()) }
+    val properties = Properties()
+        .apply {
+            this["appDirectory"] =
+                System.getProperty("user.home") + "/.coffeepot"
+            this["locationCode"] = ""
+            this["stopNames"] = ""
+            this["stopCodes"] = ""
+            this["transitFeedUrl"] = ""
+            load(configFile.reader())
+        }
 
     requireNotNull(properties["location"]) {
         "Location of weather services must be set."
