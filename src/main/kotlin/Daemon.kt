@@ -220,9 +220,10 @@ private lateinit var feedReader: FeedProcessor
 
 private fun readTransitFeed() {
     val feed = getFeed(File(appDirectory, ".cache"))
-    val feedUpToDate = feedUpToDate(feed)
+    val reader = feedProcessor(feed)
+    val feedUpToDate = reader.feedValid
     if (feedUpToDate != false) {
-        feedReader = feedProcessor(feed)
+        feedReader = reader
     } else {
         val daysUntil = LocalDate.now()
             .until(feed.feedInfos.first().feedStartDate, ChronoUnit.DAYS)
@@ -302,15 +303,3 @@ private fun failFetching(
 
     throw if (cause != null) IOException(message, cause) else IOException(message)
 }
-
-private fun feedUpToDate(feed: GtfsFeed): Boolean? {
-    val feedInfo = feed.feedInfos.firstOrNull() ?: return null
-    val now = LocalDate.now()
-    val startDate = feedInfo.feedStartDate
-    val endDate = feedInfo.feedEndDate
-    return if (startDate == null || endDate == null) null
-    else now.isBetween(startDate, endDate)
-}
-
-private fun LocalDate.isBetween(start: LocalDate, end: LocalDate) =
-    equals(start) || (isAfter(start) && isBefore(end))
