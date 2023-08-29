@@ -141,7 +141,7 @@ val weatherImageProperty: Observable<BufferedImage>
     get() = weatherImage
 private val weatherImage =
     MutableObservable<BufferedImage>(ImageIO.read(object {}.javaClass
-        .classLoader.getResource("w.png")))
+        .classLoader.getResource("default_weather.png")))
 
 fun fetchWeatherImage(location: String) {
     val url = "https://v2.wttr.in/$location.png"
