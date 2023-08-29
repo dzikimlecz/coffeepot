@@ -28,14 +28,10 @@ val servicesContainer: JPanel
             invalidate()
         }
         servicesProperty.registerOnElementRemoved {
-            removeAll()
             startUpdate()
-            invalidate()
         }
         servicesProperty.registerOnElementAdded {
-            removeAll()
             startUpdate()
-            invalidate()
         }
     }
 
@@ -119,14 +115,14 @@ private class ColorDot(val color: Color) : JPanel() {
 private val updater = Executors.newScheduledThreadPool(1)
 private var updateRunning = false
 
-private fun startUpdate() {
+private fun JPanel.startUpdate() {
     if (updateRunning) return
     updateRunning = true
     updater.schedule( {
         updateRunning = false
-        servicesContainer.removeAll()
-        servicesContainer.addServices()
-        servicesContainer.invalidate()
+        removeAll()
+        addServices()
+        invalidate()
     }, 500, TimeUnit.MILLISECONDS )
 }
 
