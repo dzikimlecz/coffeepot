@@ -35,7 +35,7 @@ object Resources {
                 check(tokens.size == 2) {
                     "Malformed locationCode: $this. (Proper example: '1, 2')."
                 }
-                tokens[0] to tokens[1]
+                tokens[0].trim() to tokens[1].trim()
             }
         }
 
