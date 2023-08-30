@@ -71,9 +71,9 @@ fun startDaemon() {
         scheduleAtFixedRate(
             {
                 try {
-                    getWeather(Resources.location)
+                    getWeather(location)
                     fetchWeatherImage(
-                        Resources.location
+                        location
                     )
                 } catch (e: IOException) {
                     println(e.message)
