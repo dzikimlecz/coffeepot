@@ -1,6 +1,8 @@
 package me.dzikimlecz.coffeepot
 
 import me.dzikimlecz.coffeepot.Resources.appDirectory
+import me.dzikimlecz.coffeepot.Resources.location
+import me.dzikimlecz.coffeepot.Resources.locationCode
 import me.dzikimlecz.coffeepot.transit.sha256
 import me.dzikimlecz.coffeepot.transit.unzipTo
 import me.dzikimlecz.coffeepot.transit.writeTo
@@ -144,7 +146,7 @@ private val weatherImage =
         .classLoader.getResource("default_weather.png")))
 
 fun fetchWeatherImage(location: String) {
-    val url = "https://v2.wttr.in/$location.png"
+    val url = weatherImageUrl
     val response = get(url) { e, code ->
         failFetchingWeather(location, url, e, code)
     }
@@ -176,6 +178,24 @@ private fun failFetchingWeather(
     e
 )
 
+private val weatherImageUrl: String
+    get() {
+        if (locationCode == null) {
+            return "https://v2.wttr.in/$location.png"
+        }
+        return buildString {
+            append("https://www.meteo.pl/um/metco/mgram_pict.php?ntype=0u&fdate=")
+            append(LocalDate.now().format(
+                DateTimeFormatter.ofPattern("yyyyMMdd")
+            ))
+            append("00&col=")
+            append(locationCode.first)
+            append("&row" +
+                    "=")
+            append(locationCode.second)
+            append("&lang=pl")
+        }
+    }
 
 ///////////////////////////////////////////////////////////////////////////
 // Transit
