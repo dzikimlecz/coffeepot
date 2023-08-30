@@ -89,7 +89,7 @@ fun servicePane(service: UpcomingService) =
         add(JLabel(service.direction).apply { font = raleway })
     }
 
-private val raleway = Font("Raleway", Font.BOLD, 25)
+private val raleway = Font("Raleway", Font.BOLD, 20)
 
 private class ColorDot(val color: Color) : JPanel() {
     override fun paint(g: Graphics?) {
