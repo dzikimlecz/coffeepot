@@ -13,10 +13,7 @@ object Resources {
 
     init {
 
-        val configFile = File(
-            System.getProperty("user.home"),
-            ".config/coffeepot/config.properties"
-        )
+        val configFile = configFile ?: defaultConfig
 
         val properties = readProperties(configFile)
 
@@ -45,6 +42,11 @@ object Resources {
     }
 
 }
+
+private val defaultConfig = File(
+    System.getProperty("user.home"),
+    ".config/coffeepot/config.properties"
+)
 
 private fun readProperties(configFile: File): Properties {
     require(configFile.exists()) { "File ${configFile.path} does not exist." }
